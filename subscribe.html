@@ -164,21 +164,23 @@
 
 <body>
     <div class="container">
-        <form id="contact" action="#" method="post" autocomplete="on">
+        <form id="contact" onsubmit="return postToGoogle();" action="#" method="GET" autocomplete="on">
+            <!-- https://script.google.com/macros/s/AKfycbzGHexuRTu7zOcm3t4URjRHf080hIsKgazlmNiYrHYKYo7uTPZFJ2opqpA6-O4E61UPuA/exec -->
+            <!-- AKfycbzGHexuRTu7zOcm3t4URjRHf080hIsKgazlmNiYrHYKYo7uTPZFJ2opqpA6-O4E61UPuA -->
             <h3>Vaccine notification form</h3>
             <h4>Fill this form to get an email when vaccine is available in your neighbourhood.</h4>
             <fieldset>
-                <label for="emal">Your Email Address</label>
-                <input placeholder="Your Email Address" name="emal" type="email" tabindex="1" required autofocus
+                <label for="entry.1551727252">Your Email Address</label>
+                <input placeholder="Your Email Address" name="entry.1551727252" id="emailField" type="email" tabindex="0" required autofocus
                     autocomplete="email">
             </fieldset>
             <fieldset>
-                <label for="pinc">Your Pincode</label>
-                <input placeholder="Your Pincode" name="pinc" type="number" tabindex="2" required>
+                <label for="entry.1789145729">Your Pincode</label>
+                <input placeholder="Your Pincode" name="entry.1789145729" id="pin" type="number" tabindex="1" required>
             </fieldset>
             <fieldset>
-                <label for="age">Your Age group</label>
-                <select id="select" name="age" tabindex="3" required>
+                <label for="entry.1686344422">Your Age group</label>
+                <select id="select" name="entry.1686344422" tabindex="2" id="age" required>
                     <option value="18" selected>18 to 45</option>
                     <option value="45">45+</option>
                 </select>
@@ -191,5 +193,52 @@
 
         </form>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- 
+    google form works even with CORS error
+    https://docs.google.com/forms/u/0/d/e/1FAIpQLSdGHzHgsj4gkNKV_2W8IJ6v4F-o9UnSEnfC1-6UslcfTmBL6w/formResponse
+{
+	"entry.1551727252": "nana@nfi.cooc",
+	"entry.1789145729": "135112",
+	"entry.1686344422": "45",
+	"fvv": "1",
+	"draftResponse": "[null,null,\"-4753557811190584244\"]\r\n",
+	"pageHistory": "0",
+	"fbzx": "-4753557811190584244"
+} -->
+
+    <script>
+        function postToGoogle() {
+          var field2 = $("#emailField").val();
+          var field3 = $("#pin").val();
+          var field4 = $("#age option:selected").text();
+      
+          if (field2 == "") {
+            alert('Please Fill Your Email');
+            document.getElementById("emailField").focus();
+            return false;
+          }
+          if (field3 == "" || field3.length > 6 || field3.length < 6) {
+            alert('Please fill correct pin code');
+            document.getElementById("pin").focus();
+            return false;
+          }
+      
+          $.ajax({
+            url: "https://docs.google.com/forms/u/0/d/e/1FAIpQLSdGHzHgsj4gkNKV_2W8IJ6v4F-o9UnSEnfC1-6UslcfTmBL6w/formResponse?",
+            data: { "entry.1551727252": field2, "entry.1789145729": field3, "entry.1686344422": field4 },
+            type: "POST",
+            dataType: "xml",
+            success: function (d) {
+                console.log("in success")
+            },
+            error: function (x, y, z) {
+            console.log("in failure but apparently posted data")
+            }
+          });
+          return false;
+        }
+      </script>
 </body>
 </html>
