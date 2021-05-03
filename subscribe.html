@@ -15,6 +15,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sicarius | Vaccine notifier</title>
+    <link rel="shortcut icon" type="image/jpg" href="./icon.svg"/>
+    
     <style>
         @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,600,400italic);
 
@@ -184,6 +186,7 @@
                 </select>
             </fieldset>
             <fieldset>
+                <input type="hidden" name="subs" value="true">
                 <button name="submit" type="submit" id="contact-submit" data-submit="...Sending">Submit</button>
             </fieldset>
             <p class="copyright">An initiative by <a href="https://sicarius.in/" target="_blank"
@@ -192,22 +195,8 @@
         </form>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-    <!-- 
-    google form works even with CORS error
-    https://docs.google.com/forms/u/0/d/e/1FAIpQLSdGHzHgsj4gkNKV_2W8IJ6v4F-o9UnSEnfC1-6UslcfTmBL6w/formResponse
-{
-	"entry.1551727252": "nana@nfi.cooc",
-	"entry.1789145729": "135112",
-	"entry.1686344422": "45",
-	"fvv": "1",
-	"draftResponse": "[null,null,\"-4753557811190584244\"]\r\n",
-	"pageHistory": "0",
-	"fbzx": "-4753557811190584244"
-} -->
-<script src="jquery-serialize-object-2.5.0/dist/jquery.serialize-object.min.js"></script>
 <script>
-    var $form = $('#contact'), url='https://script.google.com/macros/s/AKfycbw_rcwLofYrlXo60CqwwjKY4q1Wz_KcG_GJ4N7JDN62ciQVoNGYlEe6W9HeINcFv_qnIA/exec'
+    var $form = $('#contact'), url='https://script.google.com/macros/s/AKfycbyYhemcBds6B7ZCDe_Aa5b9MGu2WVg4vQsByX09X_HJ_sACtzjTHnZpqfhIN9a4MChUuw/exec'
     // v5 working url = 'https://script.google.com/macros/s/AKfycbygK8m_S4pNroCEhU5wz7Gsj5mtnh7oJrwHvYz1HUm3ENTJ2RALggqHEU2cW8CS6_Waiw/exec'
 
     $('#contact-submit').on('click', function (e) {
