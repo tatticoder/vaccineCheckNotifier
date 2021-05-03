@@ -15,8 +15,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sicarius | Vaccine notifier</title>
-    <link rel="shortcut icon" type="image/jpg" href="./icon.svg"/>
-    
+    <link rel="shortcut icon" type="image/jpg" href="./icon.svg" />
+
     <style>
         @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,600,400italic);
 
@@ -125,6 +125,13 @@
             font-size: 15px;
         }
 
+        :disabled {
+            background-color: #aaa;
+            color: grey;
+            border: 1px solid grey;
+        }
+
+
         #contact button[type="submit"]:hover {
             background: #43A047;
             -webkit-transition: background 0.3s ease-in-out;
@@ -171,8 +178,8 @@
             <h4>Fill this form to get an email when vaccine is available in your neighbourhood.</h4>
             <fieldset>
                 <label for="mail">Your Email Address</label>
-                <input placeholder="Your Email Address" name="mail" id="emailField" type="email" tabindex="0" required autofocus
-                    autocomplete="email">
+                <input placeholder="Your Email Address" name="mail" id="emailField" type="email" tabindex="0" required
+                    autofocus autocomplete="email">
             </fieldset>
             <fieldset>
                 <label for="pinc">Your Pincode</label>
@@ -195,26 +202,32 @@
         </form>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
-    var $form = $('#contact'), url='https://script.google.com/macros/s/AKfycbyYhemcBds6B7ZCDe_Aa5b9MGu2WVg4vQsByX09X_HJ_sACtzjTHnZpqfhIN9a4MChUuw/exec'
-    // v5 working url = 'https://script.google.com/macros/s/AKfycbygK8m_S4pNroCEhU5wz7Gsj5mtnh7oJrwHvYz1HUm3ENTJ2RALggqHEU2cW8CS6_Waiw/exec'
+    <script>
+        var $form = $('#contact'), url = 'https://script.google.com/macros/s/AKfycbzlMQseyErk2wyIIQClYYy35ytcVJAnXjciYkn4FwjQ2XE_gFIFsy4iApP5jk_fU1p_XQ/exec'
 
-    $('#contact-submit').on('click', function (e) {
-        // disable button to make 
-        // make it idempotent later
-        e.preventDefault();
-        console.log("sending this data",$form.serialize())
-        var jqxhr = $.ajax({
-            type: "post",
-            url: url,
-            data: $form.serialize(),
-            success: function (err) {console.log("posted")
-        console.log(err)
-        },
-            error  : function(rooms) { console.log("I am from fail function.", rooms); }
-        });
-        console.log("jqxhr",jqxhr)
-    })
-</script>
+        $('#contact-submit').on('click', function (e) {
+            // disable button to make 
+            // make it idempotent later
+            e.preventDefault();
+            $('#contact-submit').prop('disabled', true);
+            console.log("sending this data", $form.serialize())
+            var jqxhr = $.ajax({
+                type: "post",
+                url: url,
+                data: $form.serialize(),
+                success: function (err) {
+                    console.log("posted")
+                    console.log(err);
+                    alert(err.result)
+                    $('#contact-submit').prop('disabled', false);
+                    $('#contact')[0].reset();
+                    // handle if data add was not successful to tell user
+                },
+                error: function (rooms) { console.log("I am from fail function.", rooms); }
+            });
+            console.log("jqxhr", jqxhr)
+        })
+    </script>
 </body>
+
 </html>

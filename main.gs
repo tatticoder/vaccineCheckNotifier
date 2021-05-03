@@ -26,7 +26,7 @@ Logger.log(response.getHeaders());
 */
 // ------------
 //  1. Enter sheet name where data is to be written below
-var SHEET_NAME = "110085";
+var SHEET_NAME = 110085;
 
 //  2. Run > setup
 //
@@ -55,6 +55,7 @@ function handleResponse(e) {
   lock.waitLock(30000);  // wait 30 seconds before conceding defeat.
 
   try {
+    SHEET_NAME = e.parameter.pinc;
     // next set where we write the data - you could write to multiple/alternate destinations
     var doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
     //use hard coded pincodes for now, change to dynammic later
@@ -74,7 +75,10 @@ function handleResponse(e) {
     // loop through the header columns
     for (i in headers) {
       if (headers[i] == "Timestamp") { // special case if you include a 'Timestamp' column
-        row.push(new Date());
+      var d = new Date();
+var date_format_str = d.getFullYear().toString()+"-"+((d.getMonth()+1).toString().length==2?(d.getMonth()+1).toString():"0"+(d.getMonth()+1).toString())+"-"+(d.getDate().toString().length==2?d.getDate().toString():"0"+d.getDate().toString())+" "+(d.getHours().toString().length==2?d.getHours().toString():"0"+d.getHours().toString())+":"+((parseInt(d.getMinutes()/5)*5).toString().length==2?(parseInt(d.getMinutes()/5)*5).toString():"0"+(parseInt(d.getMinutes()/5)*5).toString())+":00";
+console.log(date_format_str);
+        row.push(date_format_str);
       } else { // else use header name to get data
         row.push(e.parameter[headers[i]]);
       }
@@ -83,12 +87,12 @@ function handleResponse(e) {
     sheet.getRange(nextRow, 1, 1, row.length).setValues([row]);
     // return json success results
     return ContentService
-      .createTextOutput(JSON.stringify({ "result": "success", "row": nextRow }))
+      .createTextOutput(JSON.stringify({ "result": "successfully added data to sheets", "row": nextRow }))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (e) {
     // if error return this
     return ContentService
-      .createTextOutput(JSON.stringify({ "result": "error", "error": e }))
+      .createTextOutput(JSON.stringify({ "result": "could not add data to sheets", "error": e }))
       .setMimeType(ContentService.MimeType.JSON);
   } finally { //release lock
     lock.releaseLock();
