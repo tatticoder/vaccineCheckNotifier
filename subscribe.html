@@ -12,11 +12,28 @@
     <!-- add some option to stop sending mails after 3/4 mails sent -->
     <!-- minify this code before hosting -->
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-type" content="text/html">
     <title>Vaccine notifier | Sicarius</title>
-    <link rel="shortcut icon" type="image/jpg" href="./icon.svg" />
-
+    <link rel="shortcut icon" type="image/jpg" href="/covidicon.svg" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="image" content="/codidicon.svg">
+    <meta itemprop="name" content="Sicarius Web Tech">
+    <meta itemprop="description" content="Get a website for your local business and reach a wider audience.">
+    <meta property="og:title" content="Vaccine notifier" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sicarius.in/covid" />
+    <meta property="og:image" content="/covidicon.svg"/>
+    <meta property="og:description"
+        content="Get notified by mail when vaccine is available in your neighbourhood." />
+    <meta property="og:site_name" content="Sicarius Web Tech" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:site" content="@tatticoder">
+    <meta name="twitter:title" content="Vaccine notifier">
+    <meta name="twitter:description" content="Get notified by mail when vaccine is available in your neighbourhood.">
+    <meta name="twitter:creator" content="@tatticoder">
+    <meta name="twitter:image:src" content="/covidicon.svg">
+    <link rel="canonical" href="https://sicarius.in">
     <style>
         @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,600,400italic);
 
@@ -188,7 +205,9 @@
 <body>
     <div class="container">
         <div class="popup hidden" id="successModal">
-            <p>Your data was successfully submitted. You can close this page now</p>
+            <p>Your data was successfully submitted. You can close this page now. 
+                <!-- Please check your inbox. -->
+            </p>
         </div>
         <div class="popup hidden" id="failModal">
             <p>An error occured while submitting your data, please try again after some time.</p>
