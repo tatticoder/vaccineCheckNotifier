@@ -1,107 +1,5 @@
-async function cronJob() {
-
-  //read all sheet names
-  //read 1 sheet data for recieving column
-  // if atelast one is true call api
-  const sheetList = sheetnames();
-  var sheet = "";
-  var doc = SpreadsheetApp.getActiveSpreadsheet();
-
-  for (var ind = 0; ind < sheetList.length; ++ind) {
-    // read all subscribers in this sheet
-    sheet = doc.getSheets()[ind];
-    sheet.activate();
-    // don't read log sheet
-    if ("logs" == sheet.getName()) { continue; }
-    var values = sheet.getRange("D:D").getValues();
-    // if atleast 1 subscriber is found, set api flag
-    var apiCall = false;
-    for (var j = 0; j < values.length; ++j) {
-      if (values[1][0]) {
-        apiCall = true;
-        break;
-      }
-    }
-    // if api flag is set call api and send mail to subscribers
-    if (apiCall) {
-      var data = sheet.getDataRange().getValues();
-      const response = callAPI();
-      if(response.error){
-        Logger.log("API call failed",response)
-      }
-      else{
-        Logger.log("response data is valid")
-        // now check availability in each center
-      }
-    }
-    // var data = sheet.getDataRange().getValues();
-    // for (var i = 0; i < data.length; ++i) {
-    //   Logger.log('mail: ' + data[i][0]);
-    //   Logger.log('pinc: ' + data[i][1]);
-    //   Logger.log('age: ' + data[i][2]);
-    //   Logger.log('subs: ' + data[i][3]);
-    //   Logger.log('Timestamp: ' + data[i][4]);
-    // }
-  }
-}
-
-async function checkAvailability() {
-
-    let datesArray = await fetchNext10Days();
-    datesArray.forEach(date => {
-        getSlotsForDate(date);
-    })
-}
-function getSlotsForDate(DATE) {
-  
-
-            let sessions = slots.data.sessions;
-            let validSlots = sessions.filter(slot => slot.min_age_limit <= AGE &&  slot.available_capacity > 0)
-            console.log({date:DATE, validSlots: validSlots.length})
-            if(validSlots.length > 0) {
-                notifyMe(validSlots, DATE);
-            }
-        
-}
-
-function fetchNext10Days() {
-  let dates = [];
-  let d = new Date();
-  for (let i = 0; i < 10; ++i) {
-    // d.setHours(0,0,0,0);
-    d.setDate(d.getDate() + 1);
-    // Logger.log(d.getTime())
-    let dd = d.getDate();
-    let mm = d.getMonth();
-    let yyyy = d.getFullYear();
-    let dateString = dd + "-" + mm + "-" + yyyy;
-    dates.push(dateString);
-  }
-  // Logger.log(dates)
-  return dates;
-}
-function callAPI(date, pin) {
-  // date = "06-05-2021", pin = 110085;
-  // const headers = {
-  //   'accept': 'application/json',
-  //   'Accept-Language': "hi_IN"
-  // };
-
-  // var response = UrlFetchApp.fetch(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pin}&date=${date}`, headers);
-  // var sheet = doc.getSheetByName("logs");
-  // var d = new Date();
-  // var date_format_str = d.getFullYear().toString() + "-" + ((d.getMonth() + 1).toString().length == 2 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1).toString()) + "-" + (d.getDate().toString().length == 2 ? d.getDate().toString() : "0" + d.getDate().toString()) + " " + (d.getHours().toString().length == 2 ? d.getHours().toString() : "0" + d.getHours().toString()) + ":" + ((parseInt(d.getMinutes() / 5) * 5).toString().length == 2 ? (parseInt(d.getMinutes() / 5) * 5).toString() : "0" + (parseInt(d.getMinutes() / 5) * 5).toString()) + ":00";
-  // console.log(date_format_str);
-
-  // sheet.appendRow([date_format_str, date, pin, response.getResponseCode()]);
-// if(response.getResponseCode()!=200){
-//   response={"error":response.getResponseCode()};
-// }
-  // Logger.log(response);
-  //  Logger.log(response.getContentText());
-  // Logger.log(response.getResponseCode());
-  // Logger.log(response.getHeaders());  
-var response={
+// Dummy code to navigate around response from API
+const response={
     "centers": [
         {
             "center_id": 7859,
@@ -1242,13 +1140,44 @@ var response={
         }
     ]
 };
-return response
+
+// const response={"error":403}
+
+var row_45="";
+var row_18="";
+
+if (response.error) {
+    console.log("api failed");
+} else {
+    console.log("response valid");
+    response.centers.forEach(center => {
+        checkAvailability(center);
+        if (row_45 == "") {
+            console.log("No slots available for 45 age");
+        } else {
+            console.log("slot available for 45 age group", center.center_id);
+            // console.log(row_45) send mail to people 
+        } 
+        if (row_18 == "") {
+            console.log("No slots available for 18 age");
+        } else {
+            console.log("slot available for 18 age group", center.center_id);
+            // console.log(row_18) send mail to people 
+        }
+    });
 }
-function sheetnames() {
-  // returns a array of strings containing names of all sheets
-  var out = new Array()
-  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
-  for (var i = 0; i < sheets.length; i++) out.push(sheets[i].getName())
-  Logger.log(out);
-  return out
+function checkAvailability(center) {
+    for (let index = 0; index < center.sessions.length; ++index) {
+        const session = center.sessions[index];
+        if (session.available_capacity > 0) {
+            // console.log(session.available_capacity);
+            if (session.min_age_limit == 18) {
+                // append row to 18
+                row_18+=`<tr>${session.min_age_limit},${center.name}</tr>`;
+            }
+            // append to 45 in any case 
+            row_45+=`<tr>${session.min_age_limit},${center.name}</tr>`;
+            // console.log(row_45);
+        }
+    }
 }
