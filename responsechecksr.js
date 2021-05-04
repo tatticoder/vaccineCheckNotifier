@@ -1,4 +1,4 @@
-// Dummy code to navigate around response from API
+// Dummy code to navigate around response from API  
 const response={
     "centers": [
         {
@@ -1149,22 +1149,18 @@ var row_18="";
 if (response.error) {
     console.log("api failed");
 } else {
-    console.log("response valid");
-    response.centers.forEach(center => {
-        checkAvailability(center);
-        if (row_45 == "") {
-            console.log("No slots available for 45 age");
-        } else {
-            console.log("slot available for 45 age group", center.center_id);
-            // console.log(row_45) send mail to people 
-        } 
-        if (row_18 == "") {
-            console.log("No slots available for 18 age");
-        } else {
-            console.log("slot available for 18 age group", center.center_id);
-            // console.log(row_18) send mail to people 
-        }
-    });
+    // console.log("response valid");
+    response.centers.forEach(center => checkAvailability(center));
+    if (row_45 != "") {
+        // console.log("slot available for 45 age group", center.center_id);
+        console.log(row_45) 
+        // send mail to people 
+    } 
+    if (row_18 != "") {
+        // console.log("slot available for 18 age group", center.center_id);
+        console.log(row_18) 
+        // send mail to people 
+    }
 }
 function checkAvailability(center) {
     for (let index = 0; index < center.sessions.length; ++index) {
@@ -1173,11 +1169,20 @@ function checkAvailability(center) {
             // console.log(session.available_capacity);
             if (session.min_age_limit == 18) {
                 // append row to 18
-                row_18+=`<tr>${session.min_age_limit},${center.name}</tr>`;
+                row_18+=`<tr>
+            <td data-column="Hospital">${center.name},${center.address}</td>
+            <td data-column="Min age">${session.min_age_limit}</td>
+            <td data-column="Date">${session.date}</td>
+            <td data-column="No of slots">${session.available_capacity}</td>
+            <td data-column="Vaccine">${session.vaccine}(${center.fee_type})</td></tr>`;
             }
             // append to 45 in any case 
-            row_45+=`<tr>${session.min_age_limit},${center.name}</tr>`;
-            // console.log(row_45);
+            row_45+=`<tr>
+            <td data-column="Hospital">${center.name},${center.address}</td>
+            <td data-column="Min age">${session.min_age_limit}</td>
+            <td data-column="Date">${session.date}</td>
+            <td data-column="No of slots">${session.available_capacity}</td>
+            <td data-column="Vaccine">${session.vaccine}(${center.fee_type})</td></tr>`;
         }
     }
 }
