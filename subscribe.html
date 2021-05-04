@@ -14,7 +14,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sicarius | Vaccine notifier</title>
+    <title>Vaccine notifier | Sicarius</title>
     <link rel="shortcut icon" type="image/jpg" href="./icon.svg" />
 
     <style>
@@ -42,11 +42,22 @@
             background: #4CAF50;
         }
 
+        .hidden {
+            display: none;
+        }
+
         .container {
             max-width: 400px;
             width: 100%;
             margin: 0 auto;
             position: relative;
+        }
+
+        .popup {
+            background-color: #F9F9F9;
+            color: #222;
+            padding: 1rem;
+            margin-top: 50px;
         }
 
         #contact input[type="text"],
@@ -125,18 +136,21 @@
             font-size: 15px;
         }
 
-        :disabled {
-            background-color: #aaa;
-            color: grey;
-            border: 1px solid grey;
-        }
-
-
         #contact button[type="submit"]:hover {
             background: #43A047;
             -webkit-transition: background 0.3s ease-in-out;
             -moz-transition: background 0.3s ease-in-out;
             transition: background-color 0.3s ease-in-out;
+        }
+
+        input[type="submit"]:disabled:hover {
+            cursor: not-allowed;
+        }
+
+        :disabled {
+            background-color: #aaa;
+            color: grey;
+            border: 1px solid grey;
         }
 
         #contact button[type="submit"]:active {
@@ -173,23 +187,33 @@
 
 <body>
     <div class="container">
+        <div class="popup hidden" id="successModal">
+            <p>Your data was successfully submitted. You can close this page now</p>
+        </div>
+        <div class="popup hidden" id="failModal">
+            <p>An error occured while submitting your data, please try again after some time.</p>
+        </div>
         <form id="contact" autocomplete="on">
             <h3>Vaccine notification form</h3>
-            <h4>Fill this form to get an email when vaccine is available in your neighbourhood.</h4>
+            <p style="line-height: 18px;">We check <a href="https://www.cowin.gov.in/home" target="_blank"
+                    rel="noopener noreferrer">Co-Win website</a> every few hours and will send you email as soon as it
+                is available for your age group in your neighbourhood.</p>
             <fieldset>
                 <label for="mail">Your Email Address</label>
                 <input placeholder="Your Email Address" name="mail" id="emailField" type="email" tabindex="0" required
                     autofocus autocomplete="email">
+                <p id="mailError" class="hidden">Please enter a valid email address</p>
             </fieldset>
             <fieldset>
                 <label for="pinc">Your Pincode</label>
                 <input placeholder="Your Pincode" name="pinc" id="pin" type="number" tabindex="1" required>
+                <p id="pinError" class="hidden">Please enter a 6 digit pincode</p>
             </fieldset>
             <fieldset>
                 <label for="age">Your Age group</label>
                 <select id="select" name="age" tabindex="2" id="age" required>
-                    <option value="18" selected>18 to 45</option>
-                    <option value="45">45+</option>
+                    <option value="18">18 to 45</option>
+                    <option value="45" selected>45+</option>
                 </select>
             </fieldset>
             <fieldset>
@@ -206,27 +230,53 @@
         var $form = $('#contact'), url = 'https://script.google.com/macros/s/AKfycbzlMQseyErk2wyIIQClYYy35ytcVJAnXjciYkn4FwjQ2XE_gFIFsy4iApP5jk_fU1p_XQ/exec'
 
         $('#contact-submit').on('click', function (e) {
-            // disable button to make 
-            // make it idempotent later
             e.preventDefault();
             $('#contact-submit').prop('disabled', true);
-            console.log("sending this data", $form.serialize())
-            var jqxhr = $.ajax({
-                type: "post",
-                url: url,
-                data: $form.serialize(),
-                success: function (err) {
-                    console.log("posted")
-                    console.log(err);
-                    alert(err.result)
-                    $('#contact-submit').prop('disabled', false);
-                    $('#contact')[0].reset();
-                    // handle if data add was not successful to tell user
-                },
-                error: function (rooms) { console.log("I am from fail function.", rooms); }
-            });
-            console.log("jqxhr", jqxhr)
+            // do form validation
+            if (isPin($('#pin')[0].value) && isEmail($('#emailField')[0].value)) {
+                console.log("data is valid");
+                console.log("sending this data", $form.serialize())
+                var jqxhr = $.ajax({
+                    type: "post",
+                    url: url,
+                    data: $form.serialize(),
+                    success: function (err) {
+                        // hide form and display appropriate popup
+                        $('#contact').addClass("hidden");
+
+                        if (err.row) {
+                            $('#successModal').removeClass("hidden");
+                        } else {
+                            $('#failModal').removeClass("hidden");
+                        }
+                        $('#contact')[0].reset();
+                    },
+                    error: function (rooms) { console.log("I am from fail function.", rooms); }
+                });
+                console.log("jqxhr", jqxhr)
+            } else {
+                if (!isEmail($('#emailField')[0].value))
+                    $('#mailError').removeClass("hidden");
+                else
+                    $('#mailError').addClass("hidden");
+
+                if (!isPin($('#pin').value))
+                    $('#pinError').removeClass("hidden");
+                else
+                    $('#pinError').addClass("hidden");
+
+                $('#contact-submit').prop('disabled', false);
+            }
+
         })
+        function isEmail(email) {
+            var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            return regex.test(email);
+        }
+        function isPin(pin) {
+            var regex = /^[0-9]{6}$/;
+            return regex.test(pin);
+        }
     </script>
 </body>
 
