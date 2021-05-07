@@ -2,15 +2,6 @@
 <html lang="en">
 
 <head>
-    <!-- add tracking data -->
-    <!-- make form more accesible to blind audience -->
-    <!-- Add sicarius footer/banner for self promotion -->
-    <!-- add email spam warning to reply/add to contacts -->
-    <!-- keywords, desc, theme, cache control, favicon and preview image -->
-    <!-- link to unsubscribe -->
-    <!-- add basic form validation -->
-    <!-- add some option to stop sending mails after 3/4 mails sent -->
-    <!-- minify this code before hosting -->
     <meta charset="UTF-8">
     <meta http-equiv="content-type" content="text/html">
     <title>Vaccine notifier | Sicarius</title>
@@ -23,9 +14,8 @@
     <meta property="og:title" content="Vaccine notifier" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://sicarius.in/covid" />
-    <meta property="og:image" content="/covidicon.svg"/>
-    <meta property="og:description"
-        content="Get notified by mail when vaccine is available in your neighbourhood." />
+    <meta property="og:image" content="/covidicon.svg" />
+    <meta property="og:description" content="Get notified by mail when vaccine is available in your neighbourhood." />
     <meta property="og:site_name" content="Sicarius Web Tech" />
     <meta property="og:locale" content="en_IN" />
     <meta name="twitter:site" content="@tatticoder">
@@ -36,6 +26,10 @@
     <link rel="canonical" href="https://sicarius.in">
     <style>
         @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,600,400italic);
+
+        .error {
+            box-shadow: rgba(255, 0, 0, 0.534) 0px 14px 28px, rgba(255, 0, 0, 0.849) 0px 10px 10px;
+        }
 
         * {
             margin: 0;
@@ -200,29 +194,22 @@
             color: #888;
         }
     </style>
-    <!-- Howuku Tracking Code -->
-<script>
-    (function (d) {
-        var key = "XDmzK8bq4RA2bBEn0x57aj",
-            e = d.createElement("script");
-        e.type = "text/javascript";
-        e.async = true;
-        e.src = "https://cdn.howuku.com/js/howu.js";
-        e.setAttribute("key", key);
-        d.getElementsByTagName("head")[0].appendChild(e);
-    })(document);
-</script>
 </head>
 
 <body>
     <div class="container">
         <div class="popup hidden" id="successModal">
-            <p>Your data was successfully submitted. You can close this page now. 
+            <p>Your data was successfully submitted. You can close this page now.
                 <!-- Please check your inbox. -->
             </p>
         </div>
-        <div class="popup hidden" id="failModal">
+        <div class="popup hidden error" id="failModal">
             <p>An error occured while submitting your data, please try again after some time.</p>
+        </div>
+        <div class="popup error" id="failModal">
+            <p>This service is no longer active. Use alternatives such as <a
+                    href="https://www.vaccinateme.in/covid/?type=pincode" rel="noopener noreferrer">vaccinateme</a> to
+                get notification when vaccine is available.</p>
         </div>
         <form id="contact" autocomplete="on">
             <h3>Vaccine notification form</h3>
@@ -253,7 +240,6 @@
             </fieldset>
             <p class="copyright">Made by <a href="https://sicarius.in/" target="_blank"
                     title="Sicarius Web Tech">Sicarius Web Tech</a></p>
-
         </form>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -298,7 +284,6 @@
 
                 $('#contact-submit').prop('disabled', false);
             }
-
         })
         function isEmail(email) {
             var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
