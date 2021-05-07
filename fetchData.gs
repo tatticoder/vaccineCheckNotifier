@@ -1,9 +1,6 @@
-var SCRIPT_PROP = PropertiesService.getScriptProperties(); // new property service
+var SCRIPT_PROP = PropertiesService.getScriptProperties(); 
 var doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
 var logSheet = doc.getSheetByName("logs");
-// function tempsheet(){
-//         doc.insertSheet("latest added sheet2");
-// }
 async function cronJob() {
 
   //read all sheet names
@@ -31,8 +28,8 @@ async function cronJob() {
     // if api flag is set call api and send mail to subscribers
     if (apiCall) {
       var data = sheet.getDataRange().getValues();
-      const response = callAPI(getToday(),sheet.getName());
-Logger.log(data)
+      const response = callAPI(getToday(), sheet.getName());
+      Logger.log(data)
       var row_45 = "";
       var row_18 = "";
       var odd_18 = false;
@@ -43,16 +40,16 @@ Logger.log(data)
         response.centers.forEach(center => checkAvailability(center));
         if (row_45 != "") {
           // send mail to people 
-          for (kk = 1; kk < data.length; ++kk) {
-            if (data[i][3] == "true" && data[i][2] == 45)
-              sendMail(data[i][0], row_45)
+          for (var kk = 1; kk < data.length; ++kk) {
+            if (data[kk][3] == "true" && data[kk][2] == 45)
+              sendMail(data[kk][0], row_45)
           }
         }
         if (row_18 != "") {
           // send mail to people 
-          for (kk = 1; kk < data.length; ++kk) {
-            if (data[i][3] == "true" && data[i][2] == 18)
-              sendMail(data[i][0], row_18)
+          for (var kl = 1; kl < data.length; ++kl) {
+            if (data[kl][3] == "true" && data[kl][2] == 18)
+              sendMail(data[kl][0], row_18)
           }
         }
       }
@@ -64,12 +61,12 @@ Logger.log(data)
             // console.log(session.available_capacity);
             if (session.min_age_limit == 18) {
               // append row to 18
-              row_18 += `<tr${odd_18 ? ' style="background: #eee;"' : ''}><td data-column="Hospital">${center.name},${center.address}</td><td data-column="Min age">${session.min_age_limit}</td><td data-column="Date">${session.date}</td><td data-column="No of slots">${session.available_capacity}</td><td data-column="Vaccine">${session.vaccine}(${center.fee_type})</td></tr>`; odd_18 = (!odd_18);
-
+              row_18 += `<tr${odd_18 ? ' style="background: #eee;"' : ''}><td data-column="Hospital">${center.name},${center.address}</td><td data-column="Min age">${session.min_age_limit}</td><td data-column="Date">${session.date}</td><td data-column="No of slots">${session.available_capacity}</td><td data-column="Vaccine">${session.vaccine}(${center.fee_type})</td></tr>`; 
+              odd_18 = (!odd_18);
             }
             // append to 45 in any case 
-            row_45 += `<tr${odd_45 ? ' style="background: #eee;"' : ''}><td data-column="Hospital">${center.name},${center.address}</td><td data-column="Min age">${session.min_age_limit}</td><td data-column="Date">${session.date}</td><td data-column="No of slots">${session.available_capacity}</td><td data-column="Vaccine">${session.vaccine}(${center.fee_type})</td></tr>`; odd_45 = (!odd_45);
-
+            row_45 += `<tr${odd_45 ? ' style="background: #eee;"' : ''}><td data-column="Hospital">${center.name},${center.address}</td><td data-column="Min age">${session.min_age_limit}</td><td data-column="Date">${session.date}</td><td data-column="No of slots">${session.available_capacity}</td><td data-column="Vaccine">${session.vaccine}(${center.fee_type})</td></tr>`; 
+            odd_45 = (!odd_45);
           }
         }
       }
@@ -86,43 +83,75 @@ function sendMail(recipient, rows) {
   };
   try {
     MailApp.sendEmail(recipient, subject, rows, mail_data);
-    logSheet.appendRow([getNow(), "mail_send","success",recipient]);
+    logSheet.appendRow([getNow(), "mail_send", "success", recipient]);
   } catch (err) {
-    logSheet.appendRow([getNow(),"mail_send","fail", recipient, err]);
+    logSheet.appendRow([getNow(), "mail_send", "fail", recipient, err]);
   }
 }
-function getNow(){
-    let d = new Date();
-    let dd = d.getDate();
-    let mm = d.getMonth();
-    let yyyy = d.getFullYear();
-    let HH=d.getHours();
-    let MM=d.getMinutes();
-    let SS=d.getSeconds();
-    return dd + "-" + mm + "-" + yyyy+" "+HH+":"+MM+":"+SS;
+function getNow() {
+  let d = new Date();
+  let dd = d.getDate();
+  let mm = d.getMonth();
+  let yyyy = d.getFullYear();
+  let HH = d.getHours();
+  let MM = d.getMinutes();
+  let SS = d.getSeconds();
+  return dd + "-" + mm + "-" + yyyy + " " + HH + ":" + MM + ":" + SS;
 }
-function getToday(){
-   let d = new Date();
-    let dd = d.getDate();
-    let mm = d.getMonth();
-    let yyyy = d.getFullYear();
-    return dd + "-" + mm + "-" + yyyy;
+function getToday() {
+  let d = new Date();
+  let dd = d.getDate();
+  let mm = d.getMonth();
+  let yyyy = d.getFullYear();
+  return dd + "-" + mm + "-" + yyyy;
 }
 
 function callAPI(date, pin) {
-  // date = "06-05-2021", pin = 110085;
+  date = "06-05-2021", pin = 110034;
   const headers = {
     'accept': 'application/json',
-    'Accept-Language': "hi_IN"
+    'Accept-Language': "hi_IN",
+    'muteHttpExceptions': true
   };
-  var response = UrlFetchApp.fetch(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pin}&date=${date}`, headers);
-
-  logSheet.appendRow([getNow(), 'api_fetch', response.getResponseCode(), pin, date]);
-  if (response.getResponseCode() != 200) {
-    response = { "error": response.getResponseCode() };
+  var response;
+  try {
+    response = UrlFetchApp.fetch(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pin}&date=${date}`, headers);
   }
-  // Logger.log(response.getHeaders());  
-  return response
+  catch (exception) {
+    logSheet.appendRow([getNow(), 'api_fetch', 'undefined error', exception]);
+  }
+  finally {
+    logSheet.appendRow([getNow(), 'api_fetch', response.getResponseCode(), pin, date]);
+    if (response.getResponseCode() != 200) {
+      response = { "error": response.getResponseCode() };
+    }
+    Logger.log(response.getHeaders());
+    return response
+  }
+}
+function debugAPI() {
+  const date = "06-05-2021", pin = 110034;
+  const headers = {
+    'accept': 'application/json',
+    'Accept-Language': "hi_IN",
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0'
+  };
+  let headerMap = new Map();
+  headerMap['accept'] = 'application/json';
+  headerMap['Accept-Language'] = 'en-US,en;q=0.5';
+  headerMap['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0';
+  const config = {
+    'muteHttpExceptions': true,
+    'method': 'get',
+    'headers': headers
+  };
+  var req = UrlFetchApp.getRequest(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pin}&date=${date}`, config)
+  Logger.log(req);
+
+  var response = UrlFetchApp.fetch(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pin}&date=${date}`, config);
+  Logger.log(response);
+  Logger.log(response.response.getHeaders());
+  Logger.log(response.getResponseCode());
 }
 function sheetnames() {
   // returns a array of strings containing names of all sheets

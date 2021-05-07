@@ -1,30 +1,3 @@
-/*function myFunction() {
-
-  /* To do
-
-// form se post accept karna hai
-// sheet me pincode ke hisab se dallo
-// sheewise iterate karo
-//remove fucntion bhi dalna hai
-// cron job banani hai
-Accept data from form post
-sanitize data
-append data to respective pincode sheet
-Add additional mets data such as date added and emaildisabled
-run a time triggered job on a interval which iterates over sheets and checks if there is atleast 1 person who wants email else move to next sheet
-for every sheet try to make 1 API call and check response code 200
-if successful, make a list of centers with available slots and min age 18 and send to everyone in that pincode who want it
-check for 45 age group slots on same data and send to 45 wala group (only who want it) 
-add spam warnings to form front end, add unsubscribe option
-
-  // The code below logs the HTML code of the Google home page.
-var response = UrlFetchApp.fetch("https://pokeapi.co/api/v2/pokemon/ditto");
-Logger.log(response.getContentText());
-Logger.log(response.getResponseCode());
-Logger.log(response.getHeaders());
-}
-*/
-// ------------
 //  1. Enter sheet name where data is to be written below
 var SHEET_NAME = 110085;
 
@@ -58,14 +31,15 @@ function handleResponse(e) {
     SHEET_NAME = e.parameter.pinc;
     // next set where we write the data - you could write to multiple/alternate destinations
     var doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
+    var logSheet = doc.getSheetByName("logs");
     //use hard coded pincodes for now, change to dynammic later
     var sheet = doc.getSheetByName(SHEET_NAME);
     if (!sheet) {
       doc.insertSheet(SHEET_NAME);
       sheet = doc.getSheetByName(SHEET_NAME);
       sheet.appendRow(['mail', 'pinc', 'age', 'subs', 'Timestamp']);
+      logSheet.appendRow([getNow(), 'Sheet_creation', '', SHEET_NAME]);
     }
-
 
     // we'll assume header is in row 1 but you can override with header_row in GET/POST data
     var headRow = e.parameter.header_row || 1;
@@ -75,10 +49,7 @@ function handleResponse(e) {
     // loop through the header columns
     for (i in headers) {
       if (headers[i] == "Timestamp") { // special case if you include a 'Timestamp' column
-      var d = new Date();
-var date_format_str = d.getFullYear().toString()+"-"+((d.getMonth()+1).toString().length==2?(d.getMonth()+1).toString():"0"+(d.getMonth()+1).toString())+"-"+(d.getDate().toString().length==2?d.getDate().toString():"0"+d.getDate().toString())+" "+(d.getHours().toString().length==2?d.getHours().toString():"0"+d.getHours().toString())+":"+((parseInt(d.getMinutes()/5)*5).toString().length==2?(parseInt(d.getMinutes()/5)*5).toString():"0"+(parseInt(d.getMinutes()/5)*5).toString())+":00";
-console.log(date_format_str);
-        row.push(date_format_str);
+        row.push(getNow2());
       } else { // else use header name to get data
         row.push(e.parameter[headers[i]]);
       }
@@ -99,6 +70,16 @@ console.log(date_format_str);
   }
 }
 
+function getNow2(){
+    let d = new Date();
+    let dd = d.getDate();
+    let mm = d.getMonth();
+    let yyyy = d.getFullYear();
+    let HH=d.getHours();
+    let MM=d.getMinutes();
+    let SS=d.getSeconds();
+    return dd + "-" + mm + "-" + yyyy+" "+HH+":"+MM+":"+SS;
+}
 function setup() {
   console.log("ran setup")
   var doc = SpreadsheetApp.getActiveSpreadsheet();
